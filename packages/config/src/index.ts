@@ -15,8 +15,8 @@ const boolFromString = z
 const commonEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   LOG_LEVEL: z.string().default('info'),
-  DATABASE_URL: z.string().url().default('postgres://postgres:postgres@localhost:5432/king_of_barbecue'),
-  REDIS_URL: z.string().url().default('redis://localhost:6379')
+  DATABASE_URL: z.string().url().default('postgres://postgres:postgres@127.0.0.1:5432/king_of_barbecue'),
+  REDIS_URL: z.string().url().default('redis://127.0.0.1:6379')
 });
 
 const apiEnvSchema = commonEnvSchema.extend({

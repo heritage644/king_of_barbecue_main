@@ -458,16 +458,19 @@ npm install
 cp .env.example .env
 # Edit DATABASE_URL, REDIS_URL and JWT_SECRET for your machine.
 
-# 3. Build shared packages
+# 3. Confirm PostgreSQL and Redis are reachable
+npm run check:services
+
+# 4. Build shared packages
 npm run build:packages
 
-# 4. Run migrations
+# 5. Run migrations
 npm run db:migrate
 
-# 5. Seed staff user, demo customer and menu data
+# 6. Seed staff user, demo customer and menu data
 npm run db:seed
 
-# 6. Run all services concurrently
+# 7. Run all services concurrently
 npm run dev
 ```
 
@@ -484,6 +487,39 @@ Seeded staff account:
 ```text
 Email:    admin@kingbbq.local
 Password: password123
+```
+
+### Troubleshooting: Redis `ECONNREFUSED` on `npm run dev`
+
+If you see an error like:
+
+```text
+connect ECONNREFUSED 127.0.0.1:6379
+connect ECONNREFUSED ::1:6379
+```
+
+Redis is not running or `REDIS_URL` points to the wrong host/port. Phase 1 requires Redis for guest carts, BullMQ queues and realtime fan-out.
+
+Fix:
+
+```bash
+# macOS
+brew services start redis
+
+# Ubuntu / Debian
+sudo systemctl start redis-server
+
+# WSL2 Ubuntu
+sudo service redis-server start
+
+# Then verify
+npm run check:services
+```
+
+If you use a managed Redis provider, set the correct connection string in `.env`:
+
+```bash
+REDIS_URL=redis://username:password@your-redis-host:6379
 ```
 
 ---

@@ -1,0 +1,37 @@
+{
+  "name": "king-of-barbecue-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Enterprise-ready restaurant ordering and operations platform for King of Barbecue.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build:packages": "npm run build -w @kob/shared-types && npm run build -w @kob/config",
+    "build": "npm run build:packages && npm run build -w @kob/api && npm run build -w @kob/worker && npm run build -w @kob/web",
+    "typecheck": "npm run build:packages && npm run typecheck -w @kob/api && npm run typecheck -w @kob/worker && npm run typecheck -w @kob/web",
+    "dev": "npm run build:packages && concurrently -n api,worker,web -c blue,magenta,green \"npm run dev -w @kob/api\" \"npm run dev -w @kob/worker\" \"npm run dev -w @kob/web\"",
+    "dev:api": "npm run build:packages && npm run dev -w @kob/api",
+    "dev:worker": "npm run build:packages && npm run dev -w @kob/worker",
+    "dev:web": "npm run build:packages && npm run dev -w @kob/web",
+    "db:migrate": "npm run build:packages && npm run db:migrate -w @kob/api",
+    "db:seed": "npm run build:packages && npm run db:seed -w @kob/api",
+    "test": "npm run build:packages && vitest run",
+    "lint": "npm run lint -w @kob/web"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "concurrently": "^9.1.0",
+    "typescript": "^5.7.2",
+    "vite": "^8.2.2",
+    "vitest": "^5.0.0"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  }
+}

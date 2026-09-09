@@ -448,6 +448,26 @@ Recommended native installers:
 
 Create a database named `king_of_barbecue`, then update `.env` accordingly.
 
+
+### GitHub Codespaces quick setup
+
+Codespaces is Ubuntu-based, so you can install and start PostgreSQL/Redis inside the Codespace without Docker:
+
+```bash
+npm run setup:codespaces
+npm run dev
+```
+
+Then open forwarded port `3000` from the Codespaces **Ports** tab. The API runs on port `4000` internally and browser requests go through the Next.js proxy at `/api/backend`, so you usually only need to open the web preview.
+
+If the Codespace restarts, services may stop. Restart local infrastructure with:
+
+```bash
+npm run infra:start
+npm run check:services
+npm run dev
+```
+
 ### Start the platform
 
 ```bash

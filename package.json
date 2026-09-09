@@ -23,7 +23,9 @@
     "db:seed": "npm run build:packages && npm run db:seed -w @kob/api",
     "test": "npm run build:packages && vitest run",
     "lint": "npm run lint -w @kob/web",
-    "check:services": "node scripts/check-services.mjs"
+    "check:services": "node scripts/check-services.mjs",
+    "setup:codespaces": "bash scripts/codespaces-setup.sh",
+    "infra:start": "bash scripts/start-local-infra.sh"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

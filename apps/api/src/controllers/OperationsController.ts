@@ -7,18 +7,8 @@ import { param } from '../utils/params.js';
 export class OperationsController {
   async listOrders(req: Request, res: Response) {
     try {
-      // Clean empty string query params to avoid backend validation crashes
-      const rawQuery = (req.query || {}) as Record<string, unknown>;
-      const queryParams: Record<string, unknown> = {};
-
-      for (const [key, val] of Object.entries(rawQuery)) {
-        if (typeof val === 'string' && val.trim() !== '') {
-          queryParams[key] = val.trim();
-        } else if (val !== undefined && val !== null && val !== '') {
-          queryParams[key] = val;
-        }
-      }
-
+      // Use validated/defaulted query params from middleware; fall back to raw query for safety.
+      const queryParams = (res.locals.validatedQuery ?? req.query) as Record<string, unknown>;
       const result = await orderService.listOperationsOrders(queryParams as never);
 
       // Standardize output structure for frontend compatibility

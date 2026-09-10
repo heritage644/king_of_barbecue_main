@@ -267,7 +267,9 @@ export class OrderService {
     const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
     const totalResult = await pool.query(`SELECT count(*)::int AS count FROM orders ${whereSql}`, params);
 
-    params.push(filters.limit, filters.offset);
+    const limit = Number.isFinite(Number(filters.limit)) ? Number(filters.limit) : 50;
+    const offset = Number.isFinite(Number(filters.offset)) ? Number(filters.offset) : 0;
+    params.push(limit, offset);
     const result = await pool.query(
       `SELECT * FROM orders ${whereSql}
        ORDER BY created_at DESC

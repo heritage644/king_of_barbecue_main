@@ -334,114 +334,123 @@ export class OrderService {
     return this.hydrateOrder(orderResult.rows[0], includeHistory);
   }
 
-  async transitionOrder(
-    ref: string,
-    targetStatus: OrderStatus,
-    actor: Actor,
-    options: { reasonCode?: string | null; reasonNote?: string | null; metadata?: Record<string, unknown> } = {}
-  ): Promise<OrderDTO> {
-    const order = await withTransaction(async (client) => {
-      const result = await client.query('SELECT * FROM orders WHERE id::text = $1 OR public_code = $1 FOR UPDATE', [ref]);
-      const row = result.rows[0];
-      if (!row) throw AppError.notFound('Order not found.');
-      const currentStatus = row.status as OrderStatus;
-      const currentPaymentStatus = row.payment_status as PaymentStatus;
+ async transitionOrder(
+  ref: string,
+  targetStatus: OrderStatus,
+  actor: Actor,
+  options: { reasonCode?: string | null; reasonNote?: string | null; metadata?: Record<string, unknown> } = {}
+): Promise<OrderDTO> {
+  const order = await withTransaction(async (client) => {
+    const result = await client.query('SELECT * FROM orders WHERE id::text = $1 OR public_code = $1 FOR UPDATE', [ref]);
+    const row = result.rows[0];
+    if (!row) throw AppError.notFound('Order not found.');
+    const currentStatus = row.status as OrderStatus;
+    const currentPaymentStatus = row.payment_status as PaymentStatus;
 
-      if (currentStatus === targetStatus) return this.hydrateOrderWithClient(client, row, true);
-      if (!isValidOrderTransition(currentStatus, targetStatus)) {
-        throw new AppError(409, 'INVALID_STATE_TRANSITION', `Cannot move order from ${currentStatus} to ${targetStatus}.`);
-      }
-      if (['REJECTED', 'FAILED', 'CANCELLED'].includes(targetStatus) && !options.reasonCode && !options.reasonNote) {
-        throw AppError.validation('A reason is required for rejected, failed, or cancelled orders.');
-      }
-
-      const reasonColumn =
-        targetStatus === 'REJECTED'
-          ? 'rejection_reason'
-          : targetStatus === 'FAILED'
-            ? 'failure_reason'
-            : targetStatus === 'CANCELLED'
-              ? 'cancellation_reason'
-              : null;
-      const updateParams: unknown[] = [targetStatus, row.id];
-      const reasonSql = reasonColumn ? `, ${reasonColumn} = $3` : '';
-      if (reasonColumn) updateParams.push([options.reasonCode, options.reasonNote].filter(Boolean).join(': ') || null);
-
-      const update = await client.query(
-        `UPDATE orders SET status = $1${reasonSql} WHERE id = $2 RETURNING *`,
-        updateParams
-      );
-
-      await this.insertHistory(client, {
-        orderId: row.id,
-        previousStatus: currentStatus,
-        newStatus: targetStatus,
-        previousPaymentStatus: currentPaymentStatus,
-        newPaymentStatus: currentPaymentStatus,
-        actorUserId: actor.id,
-        actorRole: actorRole(actor),
-        reasonCode: options.reasonCode ?? null,
-        reasonNote: options.reasonNote ?? null,
-        metadata: options.metadata ?? {}
-      });
-
-      return this.hydrateOrderWithClient(client, update.rows[0], true);
-    });
-
-    await this.afterOrderMutation(order, 'ORDER_UPDATED');
-    return order;
-  }
-
-  async updatePaymentStatus(
-    ref: string,
-    targetStatus: PaymentStatus,
-    actor: Actor,
-    options: { reasonNote?: string | null } = {}
-  ): Promise<OrderDTO> {
-    if (!canRoleAccess(actor.roles, PAYMENT_MANAGEMENT_ROLES)) {
-      throw AppError.forbidden('You are not allowed to update payment status.');
+    if (currentStatus === targetStatus) return this.hydrateOrderWithClient(client, row, true);
+    if (!isValidOrderTransition(currentStatus, targetStatus)) {
+      throw new AppError(409, 'INVALID_STATE_TRANSITION', `Cannot move order from ${currentStatus} to ${targetStatus}.`);
+    }
+    if (['REJECTED', 'FAILED', 'CANCELLED'].includes(targetStatus) && !options.reasonCode && !options.reasonNote) {
+      throw AppError.validation('A reason is required for rejected, failed, or cancelled orders.');
     }
 
-    const order = await withTransaction(async (client) => {
-      const result = await client.query('SELECT * FROM orders WHERE id::text = $1 OR public_code = $1 FOR UPDATE', [ref]);
-      const row = result.rows[0];
-      if (!row) throw AppError.notFound('Order not found.');
-      const currentPaymentStatus = row.payment_status as PaymentStatus;
-      const currentStatus = row.status as OrderStatus;
+    const reasonColumn =
+      targetStatus === 'REJECTED'
+        ? 'rejection_reason'
+        : targetStatus === 'FAILED'
+          ? 'failure_reason'
+          : targetStatus === 'CANCELLED'
+            ? 'cancellation_reason'
+            : null;
 
-      if (currentPaymentStatus === targetStatus) return this.hydrateOrderWithClient(client, row, true);
-      if (!isValidPaymentTransition(currentPaymentStatus, targetStatus)) {
-        throw new AppError(409, 'INVALID_STATE_TRANSITION', `Cannot move payment from ${currentPaymentStatus} to ${targetStatus}.`);
-      }
+    const updateParams: unknown[] = [targetStatus, row.id];
+    let reasonSql = '';
 
-      const update = await client.query('UPDATE orders SET payment_status = $1 WHERE id = $2 RETURNING *', [targetStatus, row.id]);
-      await client.query(
-        `UPDATE payments
-         SET status = $1, verified_by = CASE WHEN $1 = 'PAID' THEN $2 ELSE verified_by END,
-             verified_at = CASE WHEN $1 = 'PAID' THEN now() ELSE verified_at END
-         WHERE order_id = $3`,
-        [targetStatus, actor.id, row.id]
-      );
+    if (reasonColumn) {
+      updateParams.push([options.reasonCode, options.reasonNote].filter(Boolean).join(': ') || null);
+      reasonSql = `, ${reasonColumn} = $3`;
+    }
 
-      await this.insertHistory(client, {
-        orderId: row.id,
-        previousStatus: currentStatus,
-        newStatus: currentStatus,
-        previousPaymentStatus: currentPaymentStatus,
-        newPaymentStatus: targetStatus,
-        actorUserId: actor.id,
-        actorRole: actorRole(actor),
-        reasonCode: 'PAYMENT_STATUS_UPDATED',
-        reasonNote: options.reasonNote ?? null,
-        metadata: {}
-      });
+    const update = await client.query(
+      `UPDATE orders SET status = $1${reasonSql} WHERE id = $2 RETURNING *`,
+      updateParams
+    );
 
-      return this.hydrateOrderWithClient(client, update.rows[0], true);
+    await this.insertHistory(client, {
+      orderId: row.id,
+      previousStatus: currentStatus,
+      newStatus: targetStatus,
+      previousPaymentStatus: currentPaymentStatus,
+      newPaymentStatus: currentPaymentStatus,
+      actorUserId: actor.id,
+      actorRole: actorRole(actor),
+      reasonCode: options.reasonCode ?? null,
+      reasonNote: options.reasonNote ?? null,
+      metadata: options.metadata ?? {}
     });
 
-    await this.afterOrderMutation(order, 'PAYMENT_UPDATED');
-    return order;
+    return this.hydrateOrderWithClient(client, update.rows[0], true);
+  });
+
+  await this.afterOrderMutation(order, 'ORDER_UPDATED');
+  return order;
+}
+
+  async updatePaymentStatus(
+  ref: string,
+  targetStatus: PaymentStatus,
+  actor: Actor,
+  options: { reasonNote?: string | null } = {}
+): Promise<OrderDTO> {
+  if (!canRoleAccess(actor.roles, PAYMENT_MANAGEMENT_ROLES)) {
+    throw AppError.forbidden('You are not allowed to update payment status.');
   }
+
+  const order = await withTransaction(async (client) => {
+    const result = await client.query('SELECT * FROM orders WHERE id::text = $1 OR public_code = $1 FOR UPDATE', [ref]);
+    const row = result.rows[0];
+    if (!row) throw AppError.notFound('Order not found.');
+    const currentPaymentStatus = row.payment_status as PaymentStatus;
+    const currentStatus = row.status as OrderStatus;
+
+    if (currentPaymentStatus === targetStatus) return this.hydrateOrderWithClient(client, row, true);
+    if (!isValidPaymentTransition(currentPaymentStatus, targetStatus)) {
+      throw new AppError(409, 'INVALID_STATE_TRANSITION', `Cannot move payment from ${currentPaymentStatus} to ${targetStatus}.`);
+    }
+
+  const update = await client.query(
+  'UPDATE orders SET payment_status = $1::payment_status WHERE id = $2 RETURNING *',
+  [targetStatus, row.id]
+);
+
+await client.query(
+  `UPDATE payments
+   SET status = $1::payment_status,
+       verified_by = CASE WHEN $1::payment_status = 'PAID' THEN $2 ELSE verified_by END,
+       verified_at = CASE WHEN $1::payment_status = 'PAID' THEN now() ELSE verified_at END
+   WHERE order_id = $3`,
+  [targetStatus, actor.id, row.id]
+);
+
+    await this.insertHistory(client, {
+  orderId: row.id,
+  previousStatus: currentStatus,
+  newStatus: currentStatus,
+  previousPaymentStatus: currentPaymentStatus,
+  newPaymentStatus: targetStatus,
+  actorUserId: actor.id,
+  actorRole: actorRole(actor),
+  reasonCode: null, // Add this line
+  reasonNote: options.reasonNote ?? null,
+  metadata: {}
+});
+    return this.hydrateOrderWithClient(client, update.rows[0], true);
+  });
+
+  await this.afterOrderMutation(order, 'ORDER_UPDATED');
+  return order;
+}
 
   private async getProductsForCart(client: pg.PoolClient, items: RedisCartItem[]) {
     const productIds = items.map((item) => item.productId);

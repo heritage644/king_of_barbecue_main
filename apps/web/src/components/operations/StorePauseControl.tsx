@@ -46,8 +46,9 @@ export function StorePauseControl() {
     <Card className={`p-4 ${store?.isPaused ? 'border-amber-300 bg-amber-50' : 'bg-white/80'}`}>
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <div>
-          <p className="text-sm font-black uppercase tracking-[0.2em] text-primary">Store availability</p>
-          <p className="font-bold text-charcoal">{store?.isPaused ? 'Paused — new orders blocked' : 'Live — accepting orders'}</p>
+          <p className="text-sm font-black uppercase tracking-[0.2em]
+           text-primary">Store availability</p>
+          <p className="font-bold text-charcoal">{store?.isPaused ? 'King of barbecue is currently paused' : 'We are live and accepting orders accepting orders'}</p>
           {store?.pauseReason ? <p className="text-sm text-muted-foreground">{store.pauseReason}</p> : null}
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">

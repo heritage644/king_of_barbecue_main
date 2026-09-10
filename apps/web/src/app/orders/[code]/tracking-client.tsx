@@ -93,7 +93,7 @@ export function OrderTrackingClient({ publicCode }: { publicCode: string }) {
   }
 
   return (
-    <main className="container-padded py-12">
+    <main className="container-padded bg-background py-12">
       {confirmed ? (
         <Card className="mb-6 border-emerald-200 bg-emerald-50 p-4 font-semibold text-emerald-900">
           Order placed successfully. Keep this page open for live updates.

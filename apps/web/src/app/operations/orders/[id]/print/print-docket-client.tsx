@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Logo } from '@/components/store/Logo';
 import type { OrderDTO } from '@kob/shared-types';
 import { formatMoney } from '@kob/shared-types';
 import { Button } from '@/components/ui/button';
@@ -27,9 +28,9 @@ export function PrintDocketClient({ orderId }: { orderId: string }) {
       {error ? <p className="text-red-700">{error}</p> : null}
       {!order ? <p>Loading docket…</p> : (
         <article>
-          <div className="text-center">
-            <h1 className="text-xl font-black">KING OF BARBECUE</h1>
-            <p>Kitchen Docket / Receipt</p>
+          <div className="text-center flex flex-col items-center justify-center w-full ">
+           <div className='flex items-center jusify-center  '> <Logo/> <h1 className="text-xl font-black">KING OF BARBECUE</h1></div>
+            <p>Thank you for trusting us</p>
             <p>{new Date(order.createdAt).toLocaleString()}</p>
           </div>
           <hr className="my-3 border-black" />

@@ -8,7 +8,7 @@ import type { ProductCategoryDTO, ProductDTO, CartDTO } from '@kob/shared-types'
 import { formatMoney } from '@kob/shared-types';
 import { Card } from '@/components/ui/card';
 import { apiFetch, ApiError } from '@/lib/api';
-
+import { SiteHeader } from '@/components/store/SiteHeader';
 export default function MenuPage() {
   const [categories, setCategories] = useState<ProductCategoryDTO[]>([]);
   const [products, setProducts] = useState<ProductDTO[]>([]);
@@ -52,8 +52,10 @@ export default function MenuPage() {
   }
 
   return (
+    <>
+     <SiteHeader/>
     <main className="mx-auto min-h-screen max-w-md bg-[#FAFAFA] px-4 py-6 sm:px-6 md:max-w-2xl lg:max-w-5xl lg:px-8 lg:py-10">
-      
+     
       {/* Header Navigation */}
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
@@ -183,5 +185,6 @@ export default function MenuPage() {
         </div>
       )}
     </main>
+    </>
   );
 }

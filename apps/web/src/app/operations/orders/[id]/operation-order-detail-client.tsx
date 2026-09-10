@@ -64,9 +64,9 @@ export function OperationOrderDetailClient({ orderId }: { orderId: string }) {
   if (!order) return <main className="container-padded py-10"><Card className="p-8">Loading order…</Card></main>;
 
   return (
-    <main className="container-padded space-y-6 py-8">
+    <main className="container-padded bg-primary-foreground space-y-6 py-8">
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-        <div>
+        <div >
           <Button asChild variant="ghost" className="mb-3"><Link href="/operations"><ArrowLeft className="h-4 w-4" /> Back to board</Link></Button>
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="font-[var(--font-display)] text-4xl font-black text-charcoal">{order.publicCode}</h1>
@@ -75,7 +75,8 @@ export function OperationOrderDetailClient({ orderId }: { orderId: string }) {
             <ElapsedTimer startedAt={order.createdAt} />
           </div>
         </div>
-        <Button asChild variant="dark"><Link href={`/operations/orders/${order.id}/print`}><Printer className="h-4 w-4" /> Print docket</Link></Button>
+        <Button className='bg-foreground' asChild variant="dark"><Link className='' href={`/operations/orders/${order.id}/print`}>
+        <Printer className="h-4 w-4 " /> Print Receipt</Link></Button>
       </div>
 
       {error ? <Card className="border-red-200 bg-red-50 p-4 text-red-800">{error}</Card> : null}

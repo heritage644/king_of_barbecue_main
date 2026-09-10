@@ -272,17 +272,17 @@ async function quickAction(orderId: string, action: 'approve' | 'paid') {
 
   return (
 
-    <main className="container-padded space-y-6 py-8">
+    <main className="container-padded bg-primary-forground space-y-6 py-8">
 
-      <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+      <div className="flex flex-col justify-between gap-4  lg:flex-row lg:items-end">
 
         <div>
 
-          <p className="text-sm font-black uppercase tracking-[0.3em] text-primary">Live command center</p>
+          <p className="text-sm font-black uppercase tracking-[0.3em] text-primary">KING OF BARBECUE</p>
 
-          <h1 className="mt-2 font-[var(--font-display)] text-4xl font-black text-charcoal">Order board</h1>
+          <h1 className="mt-2 font-[var(--font-display)] text-4xl font-black text-destructive">Order board</h1>
 
-          <p className="mt-2 text-muted-foreground">{user ? `Signed in as ${user.email}` : 'Checking session…'} · {total} order(s)</p>
+          <p className="mt-2 text-muted-foreground">{user ? `Signed in as ${user.email}` : 'Checking session…'} · {total} order(s) this period</p>
 
         </div>
 
@@ -314,11 +314,14 @@ async function quickAction(orderId: string, action: 'approve' | 'paid') {
 
           </div>
 
-          <select name="status" className="h-11 rounded-2xl border border-input bg-white/80 px-3 text-sm font-semibold"><option value="">Any status</option>{ORDER_STATUSES.map((status) => <option key={status} value={status}>{orderStatusLabel(status)}</option>)}</select>
+          <select name="status" className="h-11 rounded-2xl border border-input bg-white/80 px-3 text-sm
+           font-semibold"><option value="">Any status</option>{ORDER_STATUSES.map((status) => <option key={status} value={status}>{orderStatusLabel(status)}</option>)}</select>
 
-          <select name="paymentStatus" className="h-11 rounded-2xl border border-input bg-white/80 px-3 text-sm font-semibold"><option value="">Any payment</option>{PAYMENT_STATUSES.map((status) => <option key={status} value={status}>{paymentStatusLabel(status)}</option>)}</select>
+          <select name="paymentStatus" className="h-11 rounded-2xl border border-input bg-white/80 px-3
+           text-sm font-semibold"><option value="">Any payment</option>{PAYMENT_STATUSES.map((status) => <option key={status} value={status}>{paymentStatusLabel(status)}</option>)}</select>
 
-          <select name="fulfillmentMethod" className="h-11 rounded-2xl border border-input bg-white/80 px-3 text-sm font-semibold"><option value="">Any fulfillment</option><option value="PICKUP">Pickup</option><option value="DELIVERY">Delivery</option></select>
+          <select name="fulfillmentMethod" className="h-11 rounded-2xl border border-input bg-white/80
+           px-3 text-sm font-semibold"><option value="">Any fulfillment</option><option value="PICKUP">Pickup</option><option value="DELIVERY">Delivery</option></select>
 
           <Button type="submit">Filter</Button>
 
@@ -354,9 +357,10 @@ async function quickAction(orderId: string, action: 'approve' | 'paid') {
 
               <div className="mb-3 flex items-center justify-between">
 
-                <h2 className="font-black text-charcoal">{group.title}</h2>
+                <h2 className="font-black text-foreground">{group.title}</h2>
 
-                <span className="rounded-full bg-charcoal px-2.5 py-1 text-xs font-bold text-white">{groupOrders.length}</span>
+                <span className="rounded-full bg-foreground px-2.5 py-1 
+                text-xs font-bold text-white">{groupOrders.length}</span>
 
               </div>
 
@@ -364,11 +368,13 @@ async function quickAction(orderId: string, action: 'approve' | 'paid') {
 
                 {groupOrders.map((order) => (
 
-                  <OrderCard key={order.id} order={order} onApprove={() => quickAction(order.id, 'approve')} onPaid={() => quickAction(order.id, 'paid')} />
+                  <OrderCard key={order.id} order={order} onApprove={() =>
+                     quickAction(order.id, 'approve')} onPaid={() => quickAction(order.id, 'paid')} />
 
                 ))}
 
-                {!groupOrders.length ? <p className="rounded-2xl border border-dashed border-border p-4 text-sm text-muted-foreground">No orders here.</p> : null}
+                {!groupOrders.length ? <p className="rounded-2xl border border-dashed border-border p-4 text-sm 
+                text-muted-foreground">No orders here.</p> : null}
 
               </div>
 
@@ -398,7 +404,7 @@ function OrderCard({ order, onApprove, onPaid }: { order: OrderDTO; onApprove: (
 
         <div>
 
-          <Link href={`/operations/orders/${order.id}`} className="text-lg font-black text-charcoal hover:text-primary">{order.publicCode}</Link>
+          <Link href={`/operations/orders/${order.id}`} className="text-lg font-black text-destructive hover:text-primary">{order.publicCode}</Link>
 
           <p className="text-sm text-muted-foreground">{order.guestName}</p>
 

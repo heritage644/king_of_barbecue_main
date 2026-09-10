@@ -1,6 +1,8 @@
 import Link from 'next/link';
-import { ShoppingBag, ShoppingCart, User } from 'lucide-react';
+import { ShoppingBag, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { CartCountBadge } from './CartCountBadge';
+import { HeaderAccountLink } from './HeaderAccountLink';
 import { Logo } from './Logo';
 
 const navItems = [
@@ -11,7 +13,7 @@ const navItems = [
   { href: '/#contact', label: 'Contact' }
 ];
 
-export function SiteHeader({ cartCount = 2 }: { cartCount?: number }) {
+export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-white/60 bg-background/85 backdrop-blur-xl">
       <div className="container-padded flex h-20 items-center justify-between gap-4">
@@ -32,6 +34,11 @@ export function SiteHeader({ cartCount = 2 }: { cartCount?: number }) {
 
         {/* Desktop Right Actions (Original Code Unchanged) */}
         <div className="hidden items-center bg-secondary  gap-2 sm:flex">
+          <HeaderAccountLink
+            showLabel
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition hover:bg-secondary/70"
+            iconClassName="h-4 w-4"
+          />
           <Button asChild variant="ghost" className="hidden sm:inline-flex">
             <Link href="/operations/login">Staff</Link>
           </Button>
@@ -52,22 +59,15 @@ export function SiteHeader({ cartCount = 2 }: { cartCount?: number }) {
             className="relative flex h-11 w-11 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:bg-gray-50 active:scale-95"
           >
             <ShoppingCart className="h-5 w-5" />
-            {cartCount > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center
-               rounded-full bg-red-500 text-[11px] font-bold text-white shadow">
-                {cartCount}
-              </span>
-            )}
+            <CartCountBadge
+              className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white shadow"
+            />
           </Link>
 
-          {/* User/Staff Profile Link */}
-          <Link
-            href="/operations/login"
-            aria-label="User account"
+          {/* User dashboard / sign-in link */}
+          <HeaderAccountLink
             className="flex h-11 w-11 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:bg-gray-50 active:scale-95"
-          >
-            <User className="h-5 w-5" />
-          </Link>
+          />
         </div>
       </div>
     </header>

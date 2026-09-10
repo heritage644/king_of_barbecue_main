@@ -9,6 +9,7 @@ import { formatMoney } from '@kob/shared-types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { apiFetch, ApiError } from '@/lib/api';
+import { notifyCartUpdated } from '@/lib/cart-events';
 
 export function CartClient() {
   const [cart, setCart] = useState<CartDTO | null>(null);
@@ -36,6 +37,7 @@ export function CartClient() {
         json: { quantity }
       });
       setCart(data.cart);
+      notifyCartUpdated();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Unable to update item.');
     } finally {
@@ -48,6 +50,7 @@ export function CartClient() {
     try {
       const data = await apiFetch<{ cart: CartDTO }>(`/cart/items/${productId}`, { method: 'DELETE' });
       setCart(data.cart);
+      notifyCartUpdated();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Unable to remove item.');
     } finally {

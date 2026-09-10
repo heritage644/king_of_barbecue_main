@@ -29,8 +29,8 @@ const browserGetInFlight = new Map<string, Promise<unknown>>();
 const browserGetCache = new Map<string, { expiresAt: number; value: unknown }>();
 const CLIENT_GET_DEDUPE_TTL_MS = 1_000;
 
-function shouldDedupeClientGet(method: string, hasBody: boolean) {
-  return typeof window !== 'undefined' && method === 'GET' && !hasBody;
+function shouldDedupeClientGet(method: string, hasBody: boolean, cache?: RequestCache) {
+  return typeof window !== 'undefined' && method === 'GET' && !hasBody && cache !== 'no-store';
 }
 
 function browserDedupeKey(url: string, init: RequestInit) {
@@ -77,7 +77,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
   const url = `${apiProxyBase}${path}`;
   const hasBody = init.body !== undefined && init.body !== null;
 
-  if (shouldDedupeClientGet(method, hasBody)) {
+  if (shouldDedupeClientGet(method, hasBody, init.cache)) {
     const key = browserDedupeKey(url, init);
     const cached = browserGetCache.get(key);
     if (cached && cached.expiresAt > Date.now()) return cached.value as T;

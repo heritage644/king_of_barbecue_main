@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { ClipboardList, Flame } from 'lucide-react';
+import { OperationsLogoutButton } from './OperationsLogoutButton';
 
 export function OperationsShell({ children }: { children: ReactNode }) {
   return (
@@ -16,6 +17,7 @@ export function OperationsShell({ children }: { children: ReactNode }) {
               <ClipboardList className="h-4 w-4" /> Board
             </Link>
             <Link className="rounded-full px-3 py-2 hover:bg-white/10 hover:text-white" href="/">Storefront</Link>
+            <OperationsLogoutButton />
           </nav>
         </div>
       </header>

@@ -29,7 +29,8 @@ export function StorePauseControl() {
     setLoading(true);
     setError(null);
     try {
-      const data = await apiFetch<{ store: StoreSettingsDTO }>(paused ? '/operations/store/pause' : '/operations/store/resume', {
+      const data = await apiFetch<{ store: StoreSettingsDTO }>(paused ? 
+        '/operations/store/pause' : '/operations/store/resume', {
         method: 'POST',
         json: paused ? { reason } : undefined
       });

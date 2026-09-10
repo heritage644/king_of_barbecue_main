@@ -1,4 +1,4 @@
-export const apiProxyBase = process.env.NEXT_PUBLIC_API_PROXY_BASE ?? '/api/backend';
+export const apiProxyBase = process.env.NEXT_PUBLIC_API_PROXY_BASE ?? '/api';
 const apiInternalUrl = process.env.API_INTERNAL_URL ?? 'http://localhost:4000';
 
 interface ApiOptions extends RequestInit {

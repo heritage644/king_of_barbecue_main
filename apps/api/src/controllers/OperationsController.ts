@@ -64,7 +64,8 @@ export class OperationsController {
       });
       return res.json({ order });
     } catch (err) {
-      return res.status(400).json({ message: err instanceof Error ? err.message : 'Failed to approve order.' });
+      return res.status(400).json({ message: err instanceof Error ? err.message :
+         'Failed to approve order.' });
     }
   }
 

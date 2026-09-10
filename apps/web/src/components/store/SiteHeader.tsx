@@ -31,7 +31,7 @@ export function SiteHeader({ cartCount = 2 }: { cartCount?: number }) {
         </nav>
 
         {/* Desktop Right Actions (Original Code Unchanged) */}
-        <div className="hidden items-center gap-2 sm:flex">
+        <div className="hidden items-center bg-secondary  gap-2 sm:flex">
           <Button asChild variant="ghost" className="hidden sm:inline-flex">
             <Link href="/operations/login">Staff</Link>
           </Button>

@@ -27,7 +27,7 @@ function isAllowedOrigin(origin: string) {
 
 export function createApp() {
   const app = express();
-
+ app.set('etag', false);
   app.set('trust proxy', 1);
   app.use(
     helmet({
@@ -56,6 +56,15 @@ export function createApp() {
   );
   app.use(express.json({ limit: '1mb' }));
   app.use(cookieParser());
+
+
+  app.use('/api', (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+  });
+  
   app.use(
     pinoHttp({
       logger,

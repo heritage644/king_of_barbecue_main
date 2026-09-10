@@ -1,13 +1,27 @@
 import type { ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Clock, MapPin, Phone, ShieldCheck, Sparkles } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Search, 
+  Plus, 
+  Home, 
+  LayoutGrid, 
+  ShoppingCart, 
+  Clock, 
+  MapPin, 
+  Phone, 
+  ShieldCheck, 
+  Sparkles 
+} from 'lucide-react';
 import type { ProductDTO } from '@kob/shared-types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { MarketingShell } from '@/components/store/MarketingShell';
 import { ProductCard } from '@/components/store/ProductCard';
 import { serverApiFetch } from '@/lib/api';
+
+const categories = ['All items', 'Grills', 'BBQ', 'Chicken', 'Sides'];
 
 const gallery = [
   'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80',
@@ -30,153 +44,244 @@ export default async function LandingPage() {
 
   return (
     <MarketingShell>
-      <main>
-        <section className="container-padded grid min-h-[calc(100vh-5rem)] items-center gap-10 py-12 lg:grid-cols-[1fr_0.9fr] lg:py-20">
-          <div className="max-w-3xl space-y-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-white/70 px-4 py-2 text-sm font-bold text-primary shadow-sm">
-              <Sparkles className="h-4 w-4" /> Live ordering now available
-            </div>
-            <div className="space-y-5">
-              <h1 className="font-[var(--font-display)] text-5xl font-black leading-[0.95] tracking-tight text-charcoal sm:text-6xl lg:text-7xl">
-                Smoke, spice and royal barbecue — ordered in minutes.
+      <main className="pb-24 sm:pb-0">
+        <section className="container-padded space-y-6 pt-4 pb-8">
+          {/* Mobile Search Input */}
+          <div className="relative w-full">
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search favorite meal"
+              className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm outline-none placeholder:text-gray-400 focus:border-primary"
+            />
+          </div>
+
+          {/* Hero Banner (Figma Dark Card with Platter Image) */}
+          <div className="relative overflow-hidden rounded-2xl bg-[#151515] p-6 text-white shadow-md sm:p-10">
+            <div className="relative z-10 max-w-[240px] space-y-2 sm:max-w-md">
+              <h1 className="text-2xl font-bold leading-tight sm:text-4xl">
+                Good food. <br />
+                <span className="text-primary">Hot</span> off the <span className="text-primary">grill</span>
               </h1>
-              <p className="max-w-2xl text-lg leading-8 text-muted-foreground">
-                Browse signature grills, rice meals, fish, chicken, sides and chilled drinks. Place a guest order, watch status updates live, and skip the WhatsApp waiting line.
+              <p className="text-xs text-gray-300 sm:text-sm">
+                Grilled favourites, BBQ classics and sides made fresh to order.
               </p>
+              <div className="pt-3">
+                <Button asChild size="sm" className="rounded-xl bg-primary hover:bg-primary/90">
+                  <Link href="/menu" className="flex items-center gap-1.5 text-xs font-semibold">
+                    Order now <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </Button>
+              </div>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button asChild size="lg">
-                <Link href="/menu">
-                  View Menu <ArrowRight className="h-5 w-5" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link href="#contact">Call the restaurant</Link>
-              </Button>
-            </div>
-            <div className="grid max-w-2xl gap-3 sm:grid-cols-3">
-              {[
-                ['Fresh off the grill', 'Prepared only after your order lands.'],
-                ['Live tracking', 'Follow approval and preparation in real time.'],
-                ['Guest checkout', 'No account required before ordering.']
-              ].map(([title, body]) => (
-                <Card key={title} className="glass-card p-4">
-                  <p className="font-bold text-charcoal">{title}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{body}</p>
-                </Card>
-              ))}
+
+            {/* Platter graphic background positioning */}
+            <div className="absolute -right-10 -bottom-6 h-48 w-48 sm:right-0 sm:bottom-0 sm:h-72 sm:w-72">
+              <Image
+                src="https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=800&q=80"
+                alt="Barbecue platter"
+                fill
+                sizes="(min-width: 640px) 300px, 200px"
+                className="object-contain"
+                priority
+              />
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-xl">
-            <div className="absolute -inset-8 rounded-[3rem] bg-primary/20 blur-3xl" />
-            <Card className="relative overflow-hidden rounded-[2.5rem] bg-charcoal text-white shadow-glow">
-              <div className="relative aspect-[4/5]">
-                <Image
-                  src="https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=1200&q=80"
-                  alt="Barbecue platter with fire-grilled meat"
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 40vw, 100vw"
-                  className="object-cover opacity-90"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/20 to-transparent" />
-                <div className="absolute bottom-0 space-y-3 p-7">
-                  <BadgeLike>Most ordered</BadgeLike>
-                  <h2 className="text-3xl font-black">Royal Mixed Grill</h2>
-                  <p className="max-w-sm text-sm leading-6 text-white/80">Smoky beef, chicken, sausage and plantain with our house pepper sauce.</p>
-                </div>
-              </div>
-            </Card>
+          {/* Category Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {categories.map((cat, index) => (
+              <button
+                key={cat}
+                className={`whitespace-nowrap rounded-xl px-4 py-2 text-xs font-semibold transition-colors ${
+                  index === 0
+                    ? 'border border-primary text-primary bg-white'
+                    : 'bg-white text-gray-600 border border-transparent hover:bg-gray-100'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </section>
 
-        <section id="featured" className="container-padded py-16">
-          <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.3em] text-primary">Featured menu</p>
-              <h2 className="mt-3 font-[var(--font-display)] text-4xl font-black text-charcoal">Popular from the pit</h2>
-            </div>
-            <Button asChild variant="outline">
-              <Link href="/menu">Explore all dishes</Link>
-            </Button>
+        {/* Popular Picks Section */}
+        <section id="featured" className="container-padded py-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-[#151515]">Popular Picks</h2>
+            <Link href="/menu" className="text-xs font-semibold text-primary hover:underline">
+              See all
+            </Link>
           </div>
+
           {featured.length ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {featured.slice(0, 6).map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
-            <Card className="glass-card p-8 text-muted-foreground">Menu is loading from the restaurant API. Start the API and seed data to see live products.</Card>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {/* Fallback Cards Matching Figma */}
+              <Card className="flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-2 shadow-sm">
+                <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-50">
+                  <Image
+                    src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80"
+                    alt="BBQ Chicken Platter"
+                    fill
+                    sizes="(min-width: 640px) 30vw, 50vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="mt-2 space-y-1">
+                  <h3 className="text-xs font-bold text-[#151515]">BBQ Chicken Platter</h3>
+                  <p className="line-clamp-2 text-[10px] text-gray-400">Smoky, flame-grilled chicken finished ...</p>
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-xs font-bold text-[#151515]">₦12,500</span>
+                    <button className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white transition hover:bg-primary/90">
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white p-2 shadow-sm">
+                <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-amber-50/50">
+                  <Image
+                    src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80"
+                    alt="Beef Suya"
+                    fill
+                    sizes="(min-width: 640px) 30vw, 50vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="mt-2 space-y-1">
+                  <h3 className="text-xs font-bold text-[#151515]">Beef Suya</h3>
+                  <p className="line-clamp-2 text-[10px] text-gray-400">Tender grilled beef coated in our signature suya spice.</p>
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-xs font-bold text-[#151515]">₦9,000</span>
+                    <span className="rounded-lg bg-gray-500 px-2 py-1 text-[10px] font-semibold text-white">
+                      Unavailable
+                    </span>
+                  </div>
+                </div>
+              </Card>
+            </div>
           )}
         </section>
 
-        <section id="gallery" className="container-padded py-16">
-          <div className="mb-8 max-w-2xl">
-            <p className="text-sm font-black uppercase tracking-[0.3em] text-primary">Gallery</p>
-            <h2 className="mt-3 font-[var(--font-display)] text-4xl font-black text-charcoal">Warm tables, bold plates, serious fire.</h2>
+        {/* Gallery Section */}
+        <section id="gallery" className="container-padded py-12">
+          <div className="mb-6 max-w-2xl">
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-primary">Gallery</p>
+            <h2 className="mt-2 text-2xl font-bold text-[#151515] sm:text-3xl">
+              Warm tables, bold plates, serious fire.
+            </h2>
           </div>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-4">
             {gallery.map((src, index) => (
-              <div key={src} className={`relative overflow-hidden rounded-[2rem] ${index === 0 ? 'md:col-span-2 md:row-span-2' : ''} min-h-64`}>
-                <Image src={src} alt="King of Barbecue gallery image" fill sizes="(min-width: 768px) 25vw, 100vw" className="object-cover" />
+              <div
+                key={src}
+                className={`relative min-h-48 overflow-hidden rounded-2xl ${
+                  index === 0 ? 'sm:col-span-2 sm:row-span-2 min-h-64' : ''
+                }`}
+              >
+                <Image
+                  src={src}
+                  alt="Gallery image"
+                  fill
+                  sizes="(min-width: 640px) 25vw, 100vw"
+                  className="object-cover"
+                />
               </div>
             ))}
           </div>
         </section>
 
-        <section id="about" className="container-padded py-16">
-          <Card className="grid overflow-hidden bg-charcoal text-white lg:grid-cols-[0.9fr_1.1fr]">
-            <div className="relative min-h-80">
-              <Image src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=80" alt="Restaurant dining room" fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
+        {/* About Section */}
+        <section id="about" className="container-padded py-12">
+          <Card className="grid overflow-hidden rounded-3xl bg-[#151515] text-white lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="relative min-h-64">
+              <Image
+                src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=80"
+                alt="Restaurant dining room"
+                fill
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                className="object-cover"
+              />
             </div>
-            <div className="space-y-5 p-8 lg:p-12">
-              <p className="text-sm font-black uppercase tracking-[0.3em] text-amber-300">About us</p>
-              <h2 className="font-[var(--font-display)] text-4xl font-black">Built around hospitality, now upgraded for speed.</h2>
-              <p className="leading-8 text-white/75">
+            <div className="space-y-4 p-6 sm:p-10">
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-amber-300">About us</p>
+              <h2 className="text-2xl font-bold sm:text-3xl">Built around hospitality, now upgraded for speed.</h2>
+              <p className="text-xs leading-6 text-white/75 sm:text-sm">
                 King of Barbecue brings the energy of a live grill to a smoother digital ordering experience. Our operations team receives structured orders instantly, verifies payment, and keeps you informed from approval to completion.
               </p>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <Info icon={<ShieldCheck className="h-5 w-5" />} label="Verified orders" />
-                <Info icon={<Clock className="h-5 w-5" />} label="Live status" />
-                <Info icon={<Sparkles className="h-5 w-5" />} label="Premium taste" />
+              <div className="grid gap-3 sm:grid-cols-3">
+                <Info icon={<ShieldCheck className="h-4 w-4" />} label="Verified orders" />
+                <Info icon={<Clock className="h-4 w-4" />} label="Live status" />
+                <Info icon={<Sparkles className="h-4 w-4" />} label="Premium taste" />
               </div>
             </div>
           </Card>
         </section>
 
-        <section id="contact" className="container-padded pb-20 pt-12">
-          <div className="grid gap-6 lg:grid-cols-3">
-            <Card className="glass-card p-6">
-              <Phone className="mb-4 h-6 w-6 text-primary" />
-              <h3 className="text-xl font-black">Call or WhatsApp</h3>
-              <a className="mt-2 block text-muted-foreground hover:text-primary" href="tel:+2348000000000">+234 800 000 0000</a>
+        {/* Contact Section */}
+        <section id="contact" className="container-padded pb-16 pt-8">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Card className="p-5">
+              <Phone className="mb-3 h-5 w-5 text-primary" />
+              <h3 className="text-base font-bold text-[#151515]">Call or WhatsApp</h3>
+              <a className="mt-1 block text-xs text-gray-500 hover:text-primary" href="tel:+2348000000000">
+                +234 800 000 0000
+              </a>
             </Card>
-            <Card className="glass-card p-6">
-              <MapPin className="mb-4 h-6 w-6 text-primary" />
-              <h3 className="text-xl font-black">Location</h3>
-              <p className="mt-2 text-muted-foreground">11 Ember Avenue, Awka, Nigeria</p>
+            <Card className="p-5">
+              <MapPin className="mb-3 h-5 w-5 text-primary" />
+              <h3 className="text-base font-bold text-[#151515]">Location</h3>
+              <p className="mt-1 text-xs text-gray-500">11 Ember Avenue, Awka, Nigeria</p>
             </Card>
-            <Card className="glass-card p-6">
-              <Clock className="mb-4 h-6 w-6 text-primary" />
-              <h3 className="text-xl font-black">Opening hours</h3>
-              <p className="mt-2 text-muted-foreground">Mon–Sat, 10:00 AM – 10:00 PM</p>
+            <Card className="p-5">
+              <Clock className="mb-3 h-5 w-5 text-primary" />
+              <h3 className="text-base font-bold text-[#151515]">Opening hours</h3>
+              <p className="mt-1 text-xs text-gray-500">Mon–Sat, 10:00 AM – 10:00 PM</p>
             </Card>
           </div>
         </section>
+
+        {/* Mobile Floating Bottom Dock (Matches Figma Image) */}
+        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 sm:hidden">
+          <nav className="flex items-center gap-1 rounded-full bg-[#151515] p-1.5 shadow-xl border border-white/10">
+            <Link
+              href="/"
+              className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white transition"
+            >
+              <Home className="h-4 w-4" />
+              Home
+            </Link>
+            <Link
+              href="/menu"
+              className="flex flex-col items-center justify-center rounded-full px-4 py-1.5 text-[10px] font-semibold text-gray-400 hover:text-white transition"
+            >
+              <LayoutGrid className="h-4 w-4" />
+              Menu
+            </Link>
+            <Link
+              href="/cart"
+              className="flex flex-col items-center justify-center rounded-full px-4 py-1.5 text-[10px] font-semibold text-gray-400 hover:text-white transition"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              Cart
+            </Link>
+          </nav>
+        </div>
       </main>
     </MarketingShell>
   );
 }
 
-function BadgeLike({ children }: { children: ReactNode }) {
-  return <span className="inline-flex rounded-full bg-amber-300 px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-charcoal">{children}</span>;
-}
-
 function Info({ icon, label }: { icon: ReactNode; label: string }) {
   return (
-    <div className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-3 text-sm font-bold">
+    <div className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs font-bold">
       {icon}
       {label}
     </div>

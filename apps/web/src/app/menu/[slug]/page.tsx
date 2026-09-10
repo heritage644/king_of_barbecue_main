@@ -5,52 +5,131 @@ import type { ProductDTO } from '@kob/shared-types';
 import { formatMoney } from '@kob/shared-types';
 import { AddToCartButton } from '@/components/store/AddToCartButton';
 import { MarketingShell } from '@/components/store/MarketingShell';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { serverApiFetch } from '@/lib/api';
 
 async function getProduct(slug: string) {
   try {
-    const data = await serverApiFetch<{ product: ProductDTO }>(`/products/${slug}`, { next: { revalidate: 30 } });
+    const data = await serverApiFetch<{ product: ProductDTO }>(`/products/${slug}`, {
+      next: { revalidate: 30 }
+    });
     return data.product;
   } catch {
     return null;
   }
 }
 
-export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+// Static mock sizes matching the Figma UI spec
+const plateSizes = [
+  { id: 'small', label: 'Small', price: '₦4,500' },
+  { id: 'medium', label: 'Medium', price: '₦8,500', selected: true },
+  { id: 'large', label: 'Large', price: '₦9,500' }
+];
+
+export default async function ProductDetailPage({
+  params
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
   const product = await getProduct(slug);
 
   return (
     <MarketingShell>
-      <main className="container-padded py-10">
-        <Button asChild variant="ghost" className="mb-6">
-          <Link href="/menu"><ArrowLeft className="h-4 w-4" /> Back to menu</Link>
-        </Button>
+      <main className="bg-white min-h-screen pb-12">
         {!product ? (
-          <Card className="glass-card p-8">Product could not be loaded. Please check the API connection.</Card>
-        ) : (
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-            <Card className="relative min-h-[420px] overflow-hidden rounded-[2.5rem] bg-secondary">
-              {product.imageUrl ? (
-                <Image src={product.imageUrl} alt={product.name} fill priority sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" />
-              ) : null}
+          <div className="container-padded py-10">
+            <Card className="p-8 text-center text-xs text-gray-500 border border-gray-100">
+              Product could not be loaded. Please check the API connection.
             </Card>
-            <div className="space-y-6 self-center">
-              <Badge variant={product.isAvailable ? 'success' : 'danger'}>{product.isAvailable ? 'Available now' : 'Temporarily sold out'}</Badge>
-              <div className="space-y-4">
-                <p className="text-sm font-black uppercase tracking-[0.3em] text-primary">{product.categoryName}</p>
-                <h1 className="font-[var(--font-display)] text-5xl font-black text-charcoal">{product.name}</h1>
-                <p className="text-lg leading-8 text-muted-foreground">{product.description}</p>
+          </div>
+        ) : (
+          <div className="mx-auto max-w-xl sm:py-8 sm:px-4">
+            <div className="overflow-hidden bg-white sm:rounded-3xl sm:border sm:border-gray-100 sm:shadow-lg">
+              
+              {/* Image Header with Floating Back Button */}
+              <div className="relative aspect-[4/3] w-full bg-gray-100">
+                {product.imageUrl && (
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    fill
+                    priority
+                    sizes="(min-width: 640px) 600px, 100vw"
+                    className="object-cover"
+                  />
+                )}
+                <Link
+                  href="/menu"
+                  aria-label="Back to menu"
+                  className="absolute top-4 left-4 flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[#151515] shadow-md transition hover:bg-gray-50 active:scale-95"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </Link>
               </div>
-              <p className="text-3xl font-black text-charcoal">{formatMoney(product.priceCents, product.currency)}</p>
-              <Card className="glass-card p-5">
-                <h2 className="mb-3 font-bold">Customize this item</h2>
-                <p className="mb-4 text-sm text-muted-foreground">Variants and add-ons are designed for a future migration. For now, add quantity and special preparation notes.</p>
-                <AddToCartButton productId={product.id} disabled={!product.isAvailable} withInstructions />
-              </Card>
+
+              {/* Product Details Section */}
+              <div className="p-5 space-y-5">
+                {/* Title & Main Price */}
+                <div>
+                  <h1 className="text-2xl font-bold text-[#151515]">{product.name}</h1>
+                  <p className="mt-1 text-xl font-bold text-primary">
+                    {formatMoney(product.priceCents, product.currency)}
+                  </p>
+                  {product.description && (
+                    <p className="mt-2 text-xs leading-relaxed text-gray-500">
+                      {product.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Plate Size Selector Box */}
+                <div className="rounded-2xl border border-gray-100 bg-gray-50/50 p-4 space-y-3">
+                  <h2 className="text-xs font-bold text-[#151515]">Plate size</h2>
+                  <div className="space-y-2.5">
+                    {plateSizes.map((size) => (
+                      <label
+                        key={size.id}
+                        className="flex items-center justify-between text-xs cursor-pointer select-none"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <input
+                            type="radio"
+                            name="plate-size"
+                            defaultChecked={size.selected}
+                            className="h-4 w-4 accent-primary text-primary border-gray-300 focus:ring-primary"
+                          />
+                          <span
+                            className={`font-medium ${
+                              size.selected ? 'text-[#151515]' : 'text-gray-500'
+                            }`}
+                          >
+                            {size.label}
+                          </span>
+                        </div>
+                        <span className="font-bold text-[#151515]">{size.price}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Preparation Note */}
+                <div className="space-y-1">
+                  <h3 className="text-xs font-bold text-[#151515]">Note:</h3>
+                  <p className="text-[11px] leading-relaxed text-gray-400">
+                    Please remember to pick a size and note that the large size contains extra meat
+                  </p>
+                </div>
+
+                {/* Add to Cart Actions (Stepper + CTA Button) */}
+                <div className="pt-2">
+                  <AddToCartButton
+                    productId={product.id}
+                    disabled={!product.isAvailable}
+                  />
+                </div>
+              </div>
+
             </div>
           </div>
         )}

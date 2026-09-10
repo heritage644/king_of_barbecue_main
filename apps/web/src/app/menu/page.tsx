@@ -1,71 +1,187 @@
-import type { ProductCategoryDTO, ProductDTO } from '@kob/shared-types';
-import { MarketingShell } from '@/components/store/MarketingShell';
-import { ProductCard } from '@/components/store/ProductCard';
-import { Button } from '@/components/ui/button';
+'use client';
+
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ShoppingCart, Plus, Check, Loader2 } from 'lucide-react';
+import type { ProductCategoryDTO, ProductDTO, CartDTO } from '@kob/shared-types';
+import { formatMoney } from '@kob/shared-types';
 import { Card } from '@/components/ui/card';
-import { serverApiFetch } from '@/lib/api';
+import { apiFetch, ApiError } from '@/lib/api';
 
-async function loadMenu() {
-  try {
-    const [categoriesData, productsData] = await Promise.all([
-      serverApiFetch<{ categories: ProductCategoryDTO[] }>('/categories', { next: { revalidate: 30 } }),
-      serverApiFetch<{ products: ProductDTO[] }>('/products', { next: { revalidate: 30 } })
-    ]);
-    return { categories: categoriesData.categories, products: productsData.products, error: null as string | null };
-  } catch {
-    return { categories: [], products: [], error: 'Unable to reach the restaurant API. Please start the API server and try again.' };
+export default function MenuPage() {
+  const [categories, setCategories] = useState<ProductCategoryDTO[]>([]);
+  const [products, setProducts] = useState<ProductDTO[]>([]);
+  const [loadingMenu, setLoadingMenu] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [addingId, setAddingId] = useState<string | null>(null);
+  const [addedId, setAddedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          apiFetch<{ categories: ProductCategoryDTO[] }>('/categories'),
+          apiFetch<{ products: ProductDTO[] }>('/products')
+        ]);
+        setCategories(catRes.categories);
+        setProducts(prodRes.products);
+      } catch (err) {
+        setError(err instanceof ApiError ? err.message : 'Unable to reach the restaurant API.');
+      } finally {
+        setLoadingMenu(false);
+      }
+    }
+    void loadData();
+  }, []);
+
+  async function handleAddToCart(productId: string) {
+    setAddingId(productId);
+    try {
+      await apiFetch<{ cart: CartDTO }>('/cart/items', {
+        method: 'POST',
+        json: { productId, quantity: 1 }
+      });
+      setAddedId(productId);
+      setTimeout(() => setAddedId(null), 1500);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Failed to add item to cart');
+    } finally {
+      setAddingId(null);
+    }
   }
-}
-
-export default async function MenuPage() {
-  const { categories, products, error } = await loadMenu();
 
   return (
-    <MarketingShell>
-      <main className="container-padded py-12">
-        <div className="mb-10 max-w-3xl space-y-4">
-          <p className="text-sm font-black uppercase tracking-[0.3em] text-primary">Full menu</p>
-          <h1 className="font-[var(--font-display)] text-5xl font-black text-charcoal">Choose your fire.</h1>
-          <p className="text-lg leading-8 text-muted-foreground">
-            Every price and availability state is loaded from the backend. Your final order total is always recalculated server-side at checkout.
-          </p>
+    <main className="mx-auto min-h-screen max-w-md bg-[#FAFAFA] px-4 py-6 sm:px-6 md:max-w-2xl lg:max-w-5xl lg:px-8 lg:py-10">
+      
+      {/* Header Navigation */}
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Delicious Eats</p>
+          <h1 className="text-2xl font-bold text-[#151515] sm:text-3xl">Our Menu</h1>
         </div>
+        
+        <Link
+          href="/cart"
+          aria-label="View cart"
+          className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-gray-100 bg-white text-[#151515] shadow-sm transition hover:bg-gray-50 active:scale-95"
+        >
+          <ShoppingCart className="h-5 w-5" />
+        </Link>
+      </div>
 
-        {categories.length ? (
-          <div className="sticky top-20 z-30 mb-8 overflow-x-auto rounded-full border border-white/70 bg-background/85 p-2 backdrop-blur">
-            <div className="flex min-w-max gap-2">
-              <Button asChild size="sm" variant="dark"><a href="#all">All</a></Button>
-              {categories.map((category) => (
-                <Button key={category.id} asChild size="sm" variant="outline">
-                  <a href={`#${category.slug}`}>{category.name}</a>
-                </Button>
-              ))}
-            </div>
+      {error ? (
+        <Card className="mb-6 border-red-200 bg-red-50 p-4 text-xs font-semibold text-red-800">
+          {error}
+        </Card>
+      ) : null}
+
+      {/* Sticky Categories */}
+      {categories.length ? (
+        <div className="sticky top-4 z-30 mb-6 overflow-x-auto rounded-2xl border border-gray-100 bg-white/90 p-1.5 shadow-sm backdrop-blur-md no-scrollbar">
+          <div className="flex min-w-max gap-1.5">
+            <a
+              href="#all"
+              className="rounded-xl bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-primary/90"
+            >
+              All
+            </a>
+            {categories.map((category) => (
+              <a
+                key={category.id}
+                href={`#${category.slug}`}
+                className="rounded-xl px-4 py-2 text-xs font-bold text-gray-500 transition hover:bg-gray-50 hover:text-[#151515]"
+              >
+                {category.name}
+              </a>
+            ))}
           </div>
-        ) : null}
+        </div>
+      ) : null}
 
-        {error ? <Card className="glass-card p-8 text-muted-foreground">{error}</Card> : null}
-
-        <div id="all" className="space-y-12">
+      {loadingMenu ? (
+        <Card className="p-8 text-center text-xs text-gray-400">Loading menu items…</Card>
+      ) : (
+        /* Grid List */
+        <div id="all" className="space-y-8">
           {categories.map((category) => {
             const categoryProducts = products.filter((product) => product.categoryId === category.id);
             if (!categoryProducts.length) return null;
+
             return (
-              <section key={category.id} id={category.slug} className="scroll-mt-36 space-y-5">
+              <section key={category.id} id={category.slug} className="scroll-mt-24 space-y-3">
                 <div>
-                  <h2 className="font-[var(--font-display)] text-3xl font-black text-charcoal">{category.name}</h2>
-                  {category.description ? <p className="mt-2 text-muted-foreground">{category.description}</p> : null}
+                  <h2 className="text-lg font-bold text-[#151515] sm:text-xl">{category.name}</h2>
+                  {category.description ? (
+                    <p className="text-xs text-gray-400">{category.description}</p>
+                  ) : null}
                 </div>
-                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                  {categoryProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
+                  {categoryProducts.map((product) => {
+                    const isAdding = addingId === product.id;
+                    const isAdded = addedId === product.id;
+
+                    return (
+                      <Card
+                        key={product.id}
+                        className="relative flex overflow-hidden rounded-2xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:shadow-md"
+                      >
+                        <div className="flex w-full gap-3">
+                          <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:h-24 sm:w-24">
+                            {product.imageUrl ? (
+                              <Image
+                                src={product.imageUrl}
+                                alt={product.name}
+                                fill
+                                sizes="(max-width: 640px) 80px, 96px"
+                                className="object-cover"
+                              />
+                            ) : null}
+                          </div>
+
+                          <div className="flex flex-1 flex-col justify-between">
+                            <div>
+                              <h3 className="text-xs font-bold text-[#151515] sm:text-sm">{product.name}</h3>
+                              {product.description ? (
+                                <p className="mt-0.5 line-clamp-2 text-[11px] text-gray-400 sm:text-xs">
+                                  {product.description}
+                                </p>
+                              ) : null}
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2">
+                              <p className="text-xs font-bold text-primary sm:text-sm">
+                                {formatMoney(product.priceCents, product.currency)}
+                              </p>
+
+                              <button
+                                type="button"
+                                onClick={() => handleAddToCart(product.id)}
+                                disabled={isAdding}
+                                className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#151515] text-white shadow-sm transition hover:bg-gray-800 active:scale-95 disabled:opacity-50 sm:h-8 sm:w-8"
+                                aria-label={`Add ${product.name} to cart`}
+                              >
+                                {isAdding ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin sm:h-4 sm:w-4" />
+                                ) : isAdded ? (
+                                  <Check className="h-3.5 w-3.5 text-emerald-400 sm:h-4 sm:w-4" />
+                                ) : (
+                                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
                 </div>
               </section>
             );
           })}
         </div>
-      </main>
-    </MarketingShell>
+      )}
+    </main>
   );
 }

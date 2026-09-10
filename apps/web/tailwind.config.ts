@@ -6,35 +6,54 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
-        card: 'hsl(var(--card))',
-        'card-foreground': 'hsl(var(--card-foreground))',
-        popover: 'hsl(var(--popover))',
-        'popover-foreground': 'hsl(var(--popover-foreground))',
-        primary: 'hsl(var(--primary))',
-        'primary-foreground': 'hsl(var(--primary-foreground))',
-        secondary: 'hsl(var(--secondary))',
-        'secondary-foreground': 'hsl(var(--secondary-foreground))',
-        muted: 'hsl(var(--muted))',
-        'muted-foreground': 'hsl(var(--muted-foreground))',
-        accent: 'hsl(var(--accent))',
-        'accent-foreground': 'hsl(var(--accent-foreground))',
-        destructive: 'hsl(var(--destructive))',
-        'destructive-foreground': 'hsl(var(--destructive-foreground))',
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        ember: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          900: '#7c2d12'
+        // Base backgrounds set strictly to pure white
+        background: '#FFFFFF',
+        foreground: '#151515',
+        card: {
+          DEFAULT: '#FFFFFF',
+          foreground: '#151515'
         },
-        charcoal: '#201914',
-        smoke: '#f6efe7'
+        popover: {
+          DEFAULT: '#FFFFFF',
+          foreground: '#151515'
+        },
+        primary: {
+          DEFAULT: '#F4511E', // Flame Orange
+          foreground: '#FFFFFF'
+        },
+        secondary: {
+          DEFAULT: '#2E8B57', // Forest Green
+          foreground: '#FFFFFF'
+        },
+        muted: {
+          DEFAULT: '#E8E8E5', // Light Gray background
+          foreground: '#777777' // Darker Gray text
+        },
+        accent: {
+          DEFAULT: '#D99000', // Gold/Amber
+          foreground: '#FFFFFF'
+        },
+        destructive: {
+          DEFAULT: '#C93C3C', // Red
+          foreground: '#FFFFFF'
+        },
+        border: '#E8E8E5',
+        input: '#E8E8E5',
+        ring: '#F4511E',
+
+        // Brand palette utilities
+        brand: {
+          orange: '#F4511E',
+          green: '#2E8B57',
+          gold: '#D99000',
+          red: '#C93C3C',
+          dark: '#151515',
+          light: '#FAFAF8',
+          white: '#FFFFFF',
+          surface: '#242424',
+          gray: '#777777',
+          border: '#E8E8E5'
+        }
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -45,7 +64,7 @@ const config: Config = {
         sans: ['var(--font-sans)', 'Inter', 'ui-sans-serif', 'system-ui']
       },
       boxShadow: {
-        glow: '0 24px 80px rgba(194, 65, 12, 0.22)'
+        glow: '0 24px 80px rgba(244, 81, 30, 0.22)'
       }
     }
   },

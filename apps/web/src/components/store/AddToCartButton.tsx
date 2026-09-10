@@ -5,6 +5,7 @@ import { ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { apiFetch, ApiError } from '@/lib/api';
+import { notifyCartUpdated } from '@/lib/cart-events';
 
 export function AddToCartButton({ productId, disabled = false, withInstructions = false }: { productId: string; disabled?: boolean; withInstructions?: boolean }) {
   const [quantity, setQuantity] = useState(1);
@@ -20,6 +21,7 @@ export function AddToCartButton({ productId, disabled = false, withInstructions 
         method: 'POST',
         json: { productId, quantity, specialInstructions: instructions || undefined }
       });
+      notifyCartUpdated();
       setMessage('Added to cart.');
     } catch (error) {
       setMessage(error instanceof ApiError ? error.message : 'Unable to add item.');

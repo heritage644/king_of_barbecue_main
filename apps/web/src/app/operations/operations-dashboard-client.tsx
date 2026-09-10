@@ -337,11 +337,20 @@ async function quickAction(orderId: string, action: 'approve' | 'paid') {
 
 
 
-      <div className="flex gap-3 overflow-x-auto pb-2 text-sm font-bold lg:hidden">
+        <div className="grid grid-cols-2 gap-2 text-xs font-bold sm:grid-cols-4 sm:gap-3 sm:text-sm">
+  {counts.map((item) => (
+    <div
+      key={item.title}
+      className="flex flex-col justify-between rounded-lg bg-white p-2.5 shadow-sm sm:flex-row lg:hidden sm:items-center sm:p-3"
+    >
+      <span className="truncate text-gray-600">{item.title}:</span>
+      <span className="text-base font-extrabold text-gray-900 sm:text-sm">
+        {item.count}
+      </span>
+    </div>
+  ))}
+</div>
 
-        {counts.map((item) => <span key={item.title} className="rounded-full bg-white px-3 py-2 shadow-sm">{item.title}: {item.count}</span>)}
-
-      </div>
 
 
 

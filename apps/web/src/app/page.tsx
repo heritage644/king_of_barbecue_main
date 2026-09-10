@@ -3,7 +3,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { 
   ArrowRight, 
-  Search, 
   Plus, 
   Home, 
   LayoutGrid, 
@@ -18,6 +17,7 @@ import type { ProductDTO } from '@kob/shared-types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { MarketingShell } from '@/components/store/MarketingShell';
+import { HomeSearchForm } from '@/components/store/HomeSearchForm';
 import { ProductCard } from '@/components/store/ProductCard';
 import { serverApiFetch } from '@/lib/api';
 
@@ -47,14 +47,7 @@ export default async function LandingPage() {
       <main className="pb-24 sm:pb-0">
         <section className="container-padded space-y-6 pt-4 pb-8">
           {/* Mobile Search Input */}
-          <div className="relative w-full">
-            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search favorite meal"
-              className="w-full rounded-full border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm outline-none placeholder:text-gray-400 focus:border-primary"
-            />
-          </div>
+          <HomeSearchForm />
 
           {/* Hero Banner (Figma Dark Card with Platter Image) */}
           <div className="relative overflow-hidden rounded-2xl bg-[#151515] p-6 text-white shadow-md sm:p-10">

@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingCart, Plus, Check, Loader2 } from 'lucide-react';
+import { SiteHeader } from '@/components/store/SiteHeader';
+import { ShoppingCart, Plus, Check, Loader2, Search } from 'lucide-react';
 import type { ProductCategoryDTO, ProductDTO, CartDTO } from '@kob/shared-types';
 import { formatMoney } from '@kob/shared-types';
 import { Card } from '@/components/ui/card';
 import { apiFetch, ApiError } from '@/lib/api';
-import { SiteHeader } from '@/components/store/SiteHeader';
+import { notifyCartUpdated } from '@/lib/cart-events';
+
 export default function MenuPage() {
   const [categories, setCategories] = useState<ProductCategoryDTO[]>([]);
   const [products, setProducts] = useState<ProductDTO[]>([]);
@@ -16,8 +18,12 @@ export default function MenuPage() {
   const [error, setError] = useState<string | null>(null);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [addedId, setAddedId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
+    const initialQuery = new URLSearchParams(window.location.search).get('q');
+    if (initialQuery) setSearchQuery(initialQuery);
+
     async function loadData() {
       try {
         const [catRes, prodRes] = await Promise.all([
@@ -42,6 +48,7 @@ export default function MenuPage() {
         method: 'POST',
         json: { productId, quantity: 1 }
       });
+      notifyCartUpdated();
       setAddedId(productId);
       setTimeout(() => setAddedId(null), 1500);
     } catch (err) {
@@ -51,11 +58,21 @@ export default function MenuPage() {
     }
   }
 
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const visibleProducts = normalizedSearch
+    ? products.filter((product) =>
+        [product.name, product.description, product.categoryName ?? '']
+          .join(' ')
+          .toLowerCase()
+          .includes(normalizedSearch)
+      )
+    : products;
+
   return (
     <>
-     <SiteHeader/>
+   
     <main className="mx-auto min-h-screen max-w-md bg-[#FAFAFA] px-4 py-6 sm:px-6 md:max-w-2xl lg:max-w-5xl lg:px-8 lg:py-10">
-     
+     <SiteHeader/>
       {/* Header Navigation */}
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
@@ -63,14 +80,26 @@ export default function MenuPage() {
           <h1 className="text-2xl font-bold text-[#151515] sm:text-3xl">Our Menu</h1>
         </div>
         
-        <Link
-          href="/cart"
-          aria-label="View cart"
-          className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-gray-100 bg-white text-[#151515] shadow-sm transition hover:bg-gray-50 active:scale-95"
-        >
-          <ShoppingCart className="h-5 w-5" />
-        </Link>
+     
       </div>
+
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Search meals, categories or descriptions"
+          className="w-full rounded-2xl border border-gray-100 bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:border-primary"
+          aria-label="Search menu"
+        />
+      </div>
+
+      {normalizedSearch ? (
+        <p className="mb-4 text-xs font-semibold text-gray-500">
+          Showing results for <span className="text-primary">{searchQuery}</span>
+        </p>
+      ) : null}
 
       {error ? (
         <Card className="mb-6 border-red-200 bg-red-50 p-4 text-xs font-semibold text-red-800">
@@ -106,8 +135,14 @@ export default function MenuPage() {
       ) : (
         /* Grid List */
         <div id="all" className="space-y-8">
+          {!error && visibleProducts.length === 0 ? (
+            <div className="rounded-3xl bg-white p-6 text-sm text-gray-500 shadow-sm">
+              No menu items match your search yet. Try a different meal, protein or category.
+            </div>
+          ) : null}
+
           {categories.map((category) => {
-            const categoryProducts = products.filter((product) => product.categoryId === category.id);
+            const categoryProducts = visibleProducts.filter((product) => product.categoryId === category.id);
             if (!categoryProducts.length) return null;
 
             return (

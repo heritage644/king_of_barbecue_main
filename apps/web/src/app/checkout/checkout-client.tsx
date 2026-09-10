@@ -11,6 +11,7 @@ import { formatMoney } from '@kob/shared-types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { apiFetch, apiProxyBase, ApiError } from '@/lib/api';
+import { notifyCartUpdated } from '@/lib/cart-events';
 
 export function CheckoutClient() {
   const router = useRouter();
@@ -59,6 +60,7 @@ export function CheckoutClient() {
           idempotencyKey
         }
       });
+      notifyCartUpdated();
       router.push(`/orders/${data.order.publicCode}?confirmed=1`);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Unable to place order.');

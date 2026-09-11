@@ -1,3 +1,4 @@
+import http from 'http';
 import { Worker } from 'bullmq';
 import { Redis } from 'ioredis';
 import pg from 'pg';
@@ -83,10 +84,27 @@ for (const worker of workers) {
   });
 }
 
+// Minimal HTTP server so Render Web Service health checks pass
+const PORT = process.env.PORT || 4001;
+const server = http.createServer((req, res) => {
+  if (req.url === '/health' || req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok', worker: 'running' }));
+  } else {
+    res.writeHead(404);
+    res.end();
+  }
+});
+
+server.listen(PORT, () => {
+  logger.info(`Worker health server listening on port ${PORT}`);
+});
+
 logger.info('King of Barbecue workers are running');
 
 async function shutdown(signal: string) {
   logger.info({ signal }, 'Shutting down workers');
+  server.close();
   await Promise.all(workers.map((worker) => worker.close()));
   await Promise.allSettled([connection.quit(), pool.end()]);
   process.exit(0);

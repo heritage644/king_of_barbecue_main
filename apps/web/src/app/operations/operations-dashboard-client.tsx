@@ -419,7 +419,7 @@ function OrderCard({ order, onApprove, onPaid }: { order: OrderDTO; onApprove: (
 
         </div>
 
-        <ElapsedTimer startedAt={order.createdAt} />
+        <ElapsedTimer startedAt={order.createdAt} status={order.status} />
 
       </div>
 

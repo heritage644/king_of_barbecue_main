@@ -72,7 +72,7 @@ export function OperationOrderDetailClient({ orderId }: { orderId: string }) {
             <h1 className="font-[var(--font-display)] text-4xl font-black text-charcoal">{order.publicCode}</h1>
             <Badge variant={orderBadgeVariant(order.status)}>{orderStatusLabel(order.status)}</Badge>
             <Badge variant={paymentBadgeVariant(order.paymentStatus)}>{paymentStatusLabel(order.paymentStatus)}</Badge>
-            <ElapsedTimer startedAt={order.createdAt} />
+            <ElapsedTimer startedAt={order.createdAt} status={order.status} />
           </div>
         </div>
         <Button className='bg-foreground' asChild variant="dark"><Link className='' href={`/operations/orders/${order.id}/print`}>

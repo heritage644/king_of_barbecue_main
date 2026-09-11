@@ -278,5 +278,6 @@ function Info({ icon, label }: { icon: ReactNode; label: string }) {
       {icon}
       {label}
     </div>
-  );
+  )
+  
 }

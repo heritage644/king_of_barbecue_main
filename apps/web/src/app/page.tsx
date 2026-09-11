@@ -17,9 +17,10 @@ import type { ProductCategoryDTO, ProductDTO } from '@kob/shared-types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { MarketingShell } from '@/components/store/MarketingShell';
-import { HomeSearchForm } from '@/components/store/HomeSearchForm';
 import { HomeFeaturedMenu } from '@/components/store/HomeFeaturedMenu';
 import { serverApiFetch } from '@/lib/api';
+import FloatingNav from '../components/ui/lowermenubar';
+import HeroBanner from '../components/ui/banner';
 
 /** Used when the product API is unreachable, so the page never shows a hole. */
 const fallbackGallery = [
@@ -56,47 +57,8 @@ export default async function LandingPage() {
   return (
     <MarketingShell>
       <main>
-      <section className="container-padded space-y-5 pt-4 pb-8">
-  {/* Mobile / tablet search */}
-  <HomeSearchForm />
-
-  {/* Hero banner */}
-  <div className="relative overflow-hidden rounded-2xl bg-[#151515] text-white shadow-md sm:rounded-[2rem]">
-    <div className="flex min-h-[160px] items-stretch justify-between sm:min-h-[220px] lg:min-h-[260px]">
-      {/* Left Content Area */}
-      <div className="flex flex-1 flex-col justify-center p-5 sm:p-8 md:p-10 lg:p-12">
-        <h1 className="text-2xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
-          Good food.
-          <br />
-          <span className="text-primary">Hot</span> off the <span className="text-primary">grill</span>
-        </h1>
-        <p className="mt-2 max-w-sm text-xs text-gray-300 sm:mt-3 sm:text-sm lg:text-base">
-          Grilled favourites, BBQ classics and sides made fresh to order.
-        </p>
-
-        <div className="mt-4 sm:mt-6">
-          <Button asChild size="lg" className="rounded-full bg-primary px-5 py-2 text-xs font-semibold hover:bg-ember-700 sm:px-6 sm:text-sm">
-            <Link href="/menu" className="inline-flex items-center gap-1.5">
-              Order now <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden />
-            </Link>
-          </Button>
-        </div>
-      </div>
-
-      {/* Right Image Container */}
-      <div className="relative w-[35%] shrink-0 sm:w-[30%] lg:w-[28%]">
-        <Image
-          src="https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=900&q=80"
-          alt="Barbecue ribs fresh off the grill"
-          fill
-          sizes="(min-width: 1024px) 28vw, (min-width: 640px) 30vw, 35vw"
-          className="object-cover object-right"
-          priority
-        />
-      </div>
-    </div>
-  </div>
-</section>
+        
+       <HeroBanner/>
 
         {/* Category rail + product grid (live from the menu API) */}
         <HomeFeaturedMenu categories={categories} products={products} featured={featured} />
@@ -186,29 +148,7 @@ export default async function LandingPage() {
           aria-label="Quick navigation"
           className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 sm:hidden"
         >
-          <div className="flex items-center gap-1 rounded-full border border-white/10 bg-[#151515] p-1.5 shadow-xl">
-            <Link
-              href="/"
-              className="flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 font-button text-xs font-normal text-white transition"
-            >
-              <Home className="h-4 w-4" />
-              Home
-            </Link>
-            <Link
-              href="/menu"
-              className="flex flex-col items-center justify-center rounded-full px-4 py-1.5 font-button text-[11px] font-normal text-gray-400 transition hover:text-white"
-            >
-              <LayoutGrid className="h-4 w-4" />
-              Menu
-            </Link>
-            <Link
-              href="/cart"
-              className="relative flex flex-col items-center justify-center rounded-full px-4 py-1.5 font-button text-[11px] font-normal text-gray-400 transition hover:text-white"
-            >
-              <ShoppingCart className="h-4 w-4" />
-              Cart
-            </Link>
-          </div>
+          <FloatingNav/>
         </nav>
       </main>
     </MarketingShell>

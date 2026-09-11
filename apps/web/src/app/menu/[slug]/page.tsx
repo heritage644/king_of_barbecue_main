@@ -39,7 +39,7 @@ export default async function ProductDetailPage({
       <main className="bg-white min-h-screen pb-12">
         {!product ? (
           <div className="container-padded py-10">
-            <Card className="p-8 text-center text-xs text-gray-500 border border-gray-100">
+            <Card className="border border-gray-100 p-8 text-center font-body text-sm font-medium text-gray-500">
               Product could not be loaded. Please check the API connection.
             </Card>
           </div>
@@ -72,12 +72,12 @@ export default async function ProductDetailPage({
               <div className="p-5 space-y-5">
                 {/* Title & Main Price */}
                 <div>
-                  <h1 className="text-2xl font-bold text-[#151515]">{product.name}</h1>
-                  <p className="mt-1 text-xl font-bold text-primary">
+                  <h1 className="text-2xl font-semibold text-[#151515] sm:text-3xl">{product.name}</h1>
+                  <p className="mt-1 font-body text-xl font-medium text-primary">
                     {formatMoney(product.priceCents, product.currency)}
                   </p>
                   {product.description && (
-                    <p className="mt-2 text-xs leading-relaxed text-gray-500">
+                    <p className="mt-2 font-body text-sm leading-6 text-gray-500">
                       {product.description}
                     </p>
                   )}
@@ -85,12 +85,12 @@ export default async function ProductDetailPage({
 
                 {/* Plate Size Selector Box */}
                 <div className="rounded-2xl border border-gray-100 bg-gray-50/50 p-4 space-y-3">
-                  <h2 className="text-xs font-bold text-[#151515]">Plate size</h2>
+                  <h2 className="text-sm font-semibold text-[#151515]">Plate size</h2>
                   <div className="space-y-2.5">
                     {plateSizes.map((size) => (
                       <label
                         key={size.id}
-                        className="flex items-center justify-between text-xs cursor-pointer select-none"
+                        className="flex cursor-pointer select-none items-center justify-between font-body text-sm font-medium"
                       >
                         <div className="flex items-center gap-2.5">
                           <input
@@ -100,7 +100,7 @@ export default async function ProductDetailPage({
                             className="h-4 w-4 accent-primary text-primary border-gray-300 focus:ring-primary"
                           />
                           <span
-                            className={`font-medium ${
+                            className={`${
                               size.selected ? 'text-[#151515]' : 'text-gray-500'
                             }`}
                           >
@@ -115,8 +115,8 @@ export default async function ProductDetailPage({
 
                 {/* Preparation Note */}
                 <div className="space-y-1">
-                  <h3 className="text-xs font-bold text-[#151515]">Note:</h3>
-                  <p className="text-[11px] leading-relaxed text-gray-400">
+                  <h3 className="text-sm font-semibold text-[#151515]">Note:</h3>
+                  <p className="font-body text-xs leading-5 text-gray-500">
                     Please remember to pick a size and note that the large size contains extra meat
                   </p>
                 </div>

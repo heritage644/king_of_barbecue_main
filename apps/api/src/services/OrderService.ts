@@ -14,7 +14,7 @@ import {
   type PaymentStatus,
   type UserRole
 } from '@kob/shared-types';
-import { isValidOrderTransition, isValidPaymentTransition } from '@kob/shared-types';
+import { isTerminalOrderStatus, isValidOrderTransition, isValidPaymentTransition } from '@kob/shared-types';
 import { pool } from '../db/pool.js';
 import { withTransaction } from '../db/transaction.js';
 import { AppError } from '../errors/AppError.js';
@@ -372,8 +372,12 @@ export class OrderService {
       reasonSql = `, ${reasonColumn} = $3`;
     }
 
+    // Terminal statuses freeze the waiting clock (see ElapsedTimer); any other
+    // transition clears it so a re-opened order starts counting again.
+    const resolvedSql = isTerminalOrderStatus(targetStatus) ? ', resolved_at = now()' : ', resolved_at = NULL';
+
     const update = await client.query(
-      `UPDATE orders SET status = $1${reasonSql} WHERE id = $2 RETURNING *`,
+      `UPDATE orders SET status = $1${reasonSql}${resolvedSql} WHERE id = $2 RETURNING *`,
       updateParams
     );
 

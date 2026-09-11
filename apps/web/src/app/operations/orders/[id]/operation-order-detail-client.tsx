@@ -64,15 +64,21 @@ export function OperationOrderDetailClient({ orderId }: { orderId: string }) {
   if (!order) return <main className="container-padded py-10"><Card className="p-8">Loading order…</Card></main>;
 
   return (
-    <main className="container-padded bg-primary-foreground space-y-6 py-8">
+    <main className="container-padded space-y-6 py-8">
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div >
           <Button asChild variant="ghost" className="mb-3"><Link href="/operations"><ArrowLeft className="h-4 w-4" /> Back to board</Link></Button>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-[var(--font-display)] text-4xl font-black text-charcoal">{order.publicCode}</h1>
+            <h1 className="text-3xl font-semibold text-charcoal sm:text-4xl">{order.publicCode}</h1>
             <Badge variant={orderBadgeVariant(order.status)}>{orderStatusLabel(order.status)}</Badge>
             <Badge variant={paymentBadgeVariant(order.paymentStatus)}>{paymentStatusLabel(order.paymentStatus)}</Badge>
-            <ElapsedTimer startedAt={order.createdAt} />
+            <ElapsedTimer
+              className="flex-none"
+              startedAt={order.createdAt}
+              status={order.status}
+              resolvedAt={order.resolvedAt}
+              fallbackEndAt={order.updatedAt}
+            />
           </div>
         </div>
         <Button className='bg-foreground' asChild variant="dark"><Link className='' href={`/operations/orders/${order.id}/print`}>
@@ -84,13 +90,13 @@ export function OperationOrderDetailClient({ orderId }: { orderId: string }) {
       <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
         <section className="space-y-6">
           <Card className="p-6">
-            <h2 className="text-2xl font-black text-charcoal">Packing list</h2>
+            <h2 className="text-xl font-semibold text-charcoal sm:text-2xl">Packing list</h2>
             <div className="mt-5 space-y-4">
               {order.items.map((item) => (
                 <div key={item.id || item.productName} className="rounded-[1.25rem] border border-border bg-white p-4">
                   <div className="flex justify-between gap-4">
                     <div>
-                      <p className="text-lg font-black">{item.quantity} × {item.productName}</p>
+                      <p className="font-body text-base font-medium">{item.quantity} × {item.productName}</p>
                       {item.specialInstructions ? <p className="mt-2 inline-flex rounded-xl bg-amber-100 px-3 py-2 text-sm font-black uppercase text-amber-950">{item.specialInstructions}</p> : null}
                     </div>
                     <p className="font-bold">{formatMoney(item.lineTotalCents, order.currency)}</p>
@@ -101,7 +107,7 @@ export function OperationOrderDetailClient({ orderId }: { orderId: string }) {
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-2xl font-black text-charcoal">Status timeline</h2>
+            <h2 className="text-xl font-semibold text-charcoal sm:text-2xl">Status timeline</h2>
             <ol className="mt-5 space-y-3">
               {order.history?.map((entry) => (
                 <li key={entry.id} className="rounded-2xl bg-white p-4 text-sm">
@@ -117,7 +123,7 @@ export function OperationOrderDetailClient({ orderId }: { orderId: string }) {
 
         <aside className="space-y-6">
           <Card className="p-6">
-            <h2 className="text-2xl font-black text-charcoal">Customer context</h2>
+            <h2 className="text-xl font-semibold text-charcoal sm:text-2xl">Customer context</h2>
             <dl className="mt-5 space-y-3 text-sm">
               <Info label="Name" value={order.guestName} />
               <Info label="Email" value={order.guestEmail} />
@@ -130,7 +136,7 @@ export function OperationOrderDetailClient({ orderId }: { orderId: string }) {
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-2xl font-black text-charcoal">Totals</h2>
+            <h2 className="text-xl font-semibold text-charcoal sm:text-2xl">Totals</h2>
             <div className="mt-5 space-y-3 text-sm">
               <Info label="Subtotal" value={formatMoney(order.subtotalCents, order.currency)} />
               <Info label="Delivery" value={formatMoney(order.deliveryFeeCents, order.currency)} />
@@ -139,7 +145,7 @@ export function OperationOrderDetailClient({ orderId }: { orderId: string }) {
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-2xl font-black text-charcoal">Controlled actions</h2>
+            <h2 className="text-xl font-semibold text-charcoal sm:text-2xl">Controlled actions</h2>
             <div className="mt-5 grid gap-3">
               {order.status === 'PENDING' ? <Button onClick={() => action(`/operations/orders/${order.id}/approve`)} disabled={loadingAction !== null}>Approve order</Button> : null}
               <div className="grid grid-cols-2 gap-2">

@@ -65,6 +65,7 @@ export function mapOrder(row: Record<string, unknown>, related?: { items?: Order
     failureReason: row.failure_reason ? String(row.failure_reason) : null,
     cancellationReason: row.cancellation_reason ? String(row.cancellation_reason) : null,
     placedAt: new Date(String(row.placed_at)).toISOString(),
+    resolvedAt: row.resolved_at ? new Date(String(row.resolved_at)).toISOString() : null,
     createdAt: new Date(String(row.created_at)).toISOString(),
     updatedAt: new Date(String(row.updated_at)).toISOString(),
     items: related?.items ?? [],

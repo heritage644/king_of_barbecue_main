@@ -365,6 +365,8 @@ export interface OrderDTO {
   failureReason?: string | null | undefined;
   cancellationReason?: string | null | undefined;
   placedAt: string;
+  /** Set when the order reaches a terminal status (completed/rejected/failed/cancelled). */
+  resolvedAt?: string | null | undefined;
   createdAt: string;
   updatedAt: string;
   items: OrderItemDTO[];

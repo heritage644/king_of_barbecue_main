@@ -25,10 +25,7 @@ export function paymentBadgeVariant(status: PaymentStatus) {
   return 'neutral' as const;
 }
 
-export function activeMinutesSince(isoDate: string) {
-  return Math.max(0, Math.floor((Date.now() - new Date(isoDate).getTime()) / 60_000));
-}
-
+/** Escalating colour for the live waiting clock (green -> amber -> red). */
 export function timerTone(minutes: number) {
   if (minutes >= 20) return 'text-red-700 bg-red-100 border-red-200';
   if (minutes >= 10) return 'text-amber-900 bg-amber-100 border-amber-200';

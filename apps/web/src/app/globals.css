@@ -24,19 +24,59 @@
     --input: 25 30% 83%;
     --ring: 18 83% 45%;
     --radius: 1.25rem;
-    --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --font-display: Georgia, "Times New Roman", serif;
+
+    /* Brand type system (self-hosted in app/layout.tsx).
+       Headings: Outfit · Body: Metropolis · Buttons: Roboto.
+       Weights live between regular (400) and semibold (600) only. */
+    --font-heading: 'Outfit', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-body: 'Metropolis', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-button: 'Roboto', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   }
 
   * {
     @apply border-border;
   }
 
+  html {
+    /* Metropolis reads wider than Inter, so keep a slightly tighter track. */
+    font-feature-settings: 'kern' 1, 'liga' 1;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background font-body text-foreground antialiased;
+    font-weight: 500; /* body copy = medium */
     background-image:
       radial-gradient(circle at top left, rgba(249, 115, 22, 0.18), transparent 34rem),
       radial-gradient(circle at 80% 10%, rgba(255, 186, 73, 0.18), transparent 28rem);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+    font-weight: 600; /* headings = semibold */
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  button,
+  [role='button'],
+  a[data-button] {
+    @apply font-button;
+    font-weight: 400; /* buttons = regular */
+    letter-spacing: 0.01em;
+  }
+
+  /* Keep form controls on the body face so Metropolis is consistent everywhere. */
+  input,
+  textarea,
+  select {
+    @apply font-body;
+    font-weight: 500;
   }
 
   ::selection {
@@ -53,8 +93,34 @@
     @apply border border-white/50 bg-white/70 shadow-xl shadow-amber-950/5 backdrop-blur;
   }
 
+  /* Horizontal rails (category pills, board counters) scroll cleanly without
+      visible chrome on mobile and wrap into a grid on larger screens. */
+  .rail {
+    @apply flex items-center gap-2 overflow-x-auto pb-1;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .rail > * {
+    scroll-snap-align: start;
+  }
+
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+
   .receipt-print {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  }
+
+  /* Thermal dockets keep the monospace receipt face, headings included,
+     and cap at semibold because no heavier weight is loaded. */
+  .receipt-print :is(h1, h2, h3, h4, h5, h6) {
+    font-family: inherit;
+    letter-spacing: 0;
+    font-weight: 600;
   }
 }
 

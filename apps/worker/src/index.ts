@@ -12,7 +12,7 @@ const { Pool } = pg;
 const pool = new Pool({ connectionString: config.databaseUrl, max: 5 });
 
 // --- Minimal HTTP server just to satisfy Render's port scan ---
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('ok');

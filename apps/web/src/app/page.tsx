@@ -56,71 +56,47 @@ export default async function LandingPage() {
   return (
     <MarketingShell>
       <main>
-        <section className="container-padded space-y-5 pt-4 pb-8">
-          {/* Mobile / tablet search */}
-          <HomeSearchForm />
+      <section className="container-padded space-y-5 pt-4 pb-8">
+  {/* Mobile / tablet search */}
+  <HomeSearchForm />
 
-          {/* Hero banner — fluid grid so copy and platter never collide, from
-              a 320px phone up to an ultrawide desktop. */}
-          <div className="relative isolate overflow-hidden rounded-2xl bg-[#151515] text-white shadow-md sm:rounded-[2rem]">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_130%_at_88%_-10%,rgba(244,81,30,0.45),transparent_58%)]"
-            />
-            <div className="relative grid items-center gap-6 p-6 sm:p-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 lg:p-14 xl:gap-14">
-              <div className="max-w-xl space-y-3 sm:space-y-4">
-                <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 font-button text-[11px] font-normal uppercase tracking-[0.18em] text-white/70">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden />
-                  Grilled to order in Awka
-                </p>
-                <h1 className="text-[1.75rem] leading-[1.12] sm:text-4xl lg:text-5xl xl:text-[3.5rem]">
-                  Good food.
-                  <br />
-                  <span className="text-primary">Hot</span> off the <span className="text-primary">grill</span>
-                </h1>
-                <p className="max-w-md font-body text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
-                  Grilled favourites, BBQ classics and sides made fresh to order — tracked live from approval to
-                  completion.
-                </p>
+  {/* Hero banner */}
+  <div className="relative overflow-hidden rounded-2xl bg-[#151515] text-white shadow-md sm:rounded-[2rem]">
+    <div className="flex min-h-[160px] items-stretch justify-between sm:min-h-[220px] lg:min-h-[260px]">
+      {/* Left Content Area */}
+      <div className="flex flex-1 flex-col justify-center p-5 sm:p-8 md:p-10 lg:p-12">
+        <h1 className="text-2xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl">
+          Good food.
+          <br />
+          <span className="text-primary">Hot</span> off the <span className="text-primary">grill</span>
+        </h1>
+        <p className="mt-2 max-w-sm text-xs text-gray-300 sm:mt-3 sm:text-sm lg:text-base">
+          Grilled favourites, BBQ classics and sides made fresh to order.
+        </p>
 
-                <div className="flex flex-wrap items-center gap-3 pt-2">
-                  <Button asChild size="lg" className="bg-primary px-6 text-[15px] hover:bg-ember-700">
-                    <Link href="/menu">
-                      Order now <ArrowRight className="h-4 w-4" aria-hidden />
-                    </Link>
-                  </Button>
-                  <Button asChild size="lg" variant="ghost" className="border border-white/20 px-5 text-[15px] text-white hover:bg-white/10">
-                    <Link href="#featured">See today’s picks</Link>
-                  </Button>
-                </div>
+        <div className="mt-4 sm:mt-6">
+          <Button asChild size="lg" className="rounded-full bg-primary px-5 py-2 text-xs font-semibold hover:bg-ember-700 sm:px-6 sm:text-sm">
+            <Link href="/menu" className="inline-flex items-center gap-1.5">
+              Order now <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden />
+            </Link>
+          </Button>
+        </div>
+      </div>
 
-                <ul className="flex flex-wrap gap-x-5 gap-y-2 pt-4 font-body text-xs font-medium text-white/60 sm:text-sm">
-                  <li className="flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5 text-primary" aria-hidden /> 15–25 min kitchen time
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <Radar className="h-3.5 w-3.5 text-primary" aria-hidden /> Live status
-                  </li>
-                  <li className="flex items-center gap-1.5">
-                    <ShieldCheck className="h-3.5 w-3.5 text-primary" aria-hidden /> Verified payments
-                  </li>
-                </ul>
-              </div>
-
-              {/* Platter */}
-              <div className="relative mx-auto aspect-square w-full max-w-[220px] sm:ms-auto sm:me-0 sm:max-w-[300px] lg:max-w-[380px] xl:max-w-[440px]">
-                <Image
-                  src="https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=900&q=80"
-                  alt="Barbecue platter fresh off the grill"
-                  fill
-                  sizes="(min-width: 1024px) 40vw, (min-width: 640px) 300px, 220px"
-                  className="object-contain drop-shadow-[0_24px_48px_rgba(0,0,0,0.45)]"
-                  priority
-                />
-              </div>
-            </div>
-          </div>
-        </section>
+      {/* Right Image Container */}
+      <div className="relative w-[35%] shrink-0 sm:w-[30%] lg:w-[28%]">
+        <Image
+          src="https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=900&q=80"
+          alt="Barbecue ribs fresh off the grill"
+          fill
+          sizes="(min-width: 1024px) 28vw, (min-width: 640px) 30vw, 35vw"
+          className="object-cover object-right"
+          priority
+        />
+      </div>
+    </div>
+  </div>
+</section>
 
         {/* Category rail + product grid (live from the menu API) */}
         <HomeFeaturedMenu categories={categories} products={products} featured={featured} />

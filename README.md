@@ -367,12 +367,12 @@ Base URL: `http://localhost:4000/api`
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Landing page with navigation, hero, featured menu, gallery, about and contact/location sections. |
-| `/menu` | Category-grouped menu with live backend data and add-to-cart actions. |
+| `/` | Landing page with navigation, responsive hero, live category-filtered menu rail, gallery, about, contact/location sections and a data-driven footer. |
+| `/menu` | Category-grouped menu with live backend data, deep-linked category filter (`/menu?category=<slug>`), search and add-to-cart actions. |
 | `/menu/[slug]` | Product details with large image, quantity selector and special instructions. |
 | `/cart` | Redis-backed cart summary, empty state and quantity controls. |
 | `/checkout` | Guest checkout with pickup/delivery, contact details and manual/COD payment options. |
-| `/orders/[code]` | Confirmation + real-time order tracking + guest-to-account creation. |
+| `/orders/[code]` | Confirmation + real-time order tracking + guest-to-account creation. The session is resolved on the server, so signed-in customers see account controls instead of sign-up prompts. |
 | `/dashboard/orders` | Basic authenticated customer order dashboard. |
 
 ### Operations portal
@@ -380,7 +380,7 @@ Base URL: `http://localhost:4000/api`
 | Route | Purpose |
 | --- | --- |
 | `/operations/login` | Secure staff login. |
-| `/operations` | Live order board, filters, search, audio alerts and store pause control. |
+| `/operations` | Live order board, filters, search, audio alerts and store pause control. Each card shows a waiting clock that freezes (and relabels to “Fulfilled in / Closed after”) once the order reaches a terminal status. |
 | `/operations/orders/[id]` | Full operational order detail, customer context, packing list and controlled actions. |
 | `/operations/orders/[id]/print` | Compact browser-printable docket/receipt view. |
 
@@ -390,6 +390,22 @@ Base URL: `http://localhost:4000/api`
 - Client Components for cart mutations, checkout forms, SSE tracking, operations board and audio alerts.
 - shadcn-style local UI primitives in `apps/web/src/components/ui`.
 - No global client state library; cart and order state are authoritative in backend/Redis/PostgreSQL.
+
+### Typography and brand tokens
+
+Fonts are self-hosted through Fontsource (no third-party CDN at runtime) and wired up in
+`apps/web/src/app/layout.tsx`, `globals.css` and `tailwind.config.ts`:
+
+| Role | Family | Weight | Tailwind |
+| --- | --- | --- | --- |
+| Headings | Outfit | 600 (semibold) | `font-heading` |
+| Body copy | Metropolis | 500 (medium) | `font-body` (default on `body`/`sans`) |
+| Buttons & controls | Roboto | 400 (regular) | `font-button` |
+
+Only the 400/500/600 cuts ship, so the Tailwind `fontWeight` scale is capped at 600 — legacy
+`font-bold`/`font-black` utilities resolve to semibold instead of synthesising a faux weight.
+Marketing/contact copy (hours, phone, address, socials, quick links) lives in
+`apps/web/src/lib/site.ts` and feeds the header, footer and hero.
 
 ---
 

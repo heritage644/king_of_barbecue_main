@@ -2,6 +2,7 @@ import { Worker } from 'bullmq';
 import { Redis } from 'ioredis';
 import pg from 'pg';
 import pino from 'pino';
+import http from 'http';
 import { getWorkerConfig } from '@kob/config';
 import { QUEUE_NAMES } from '@kob/shared-types';
 
@@ -9,6 +10,17 @@ const config = getWorkerConfig();
 const logger = pino({ level: config.logLevel });
 const { Pool } = pg;
 const pool = new Pool({ connectionString: config.databaseUrl, max: 5 });
+
+// --- Minimal HTTP server just to satisfy Render's port scan ---
+const port = process.env.PORT || 3000;
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('ok');
+});
+server.listen(port, () => {
+  logger.info({ port }, 'Health check server listening');
+});
+// ----------------------------------------------------------------
 
 function createConnection(name: string) {
   const connection = new Redis(config.redisUrl, {
@@ -89,6 +101,7 @@ async function shutdown(signal: string) {
   logger.info({ signal }, 'Shutting down workers');
   await Promise.all(workers.map((worker) => worker.close()));
   await Promise.allSettled([connection.quit(), pool.end()]);
+  server.close();
   process.exit(0);
 }
 
